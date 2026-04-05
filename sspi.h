@@ -24,11 +24,11 @@
 #define SSPI_H
 
 #ifdef __CYGWIN__
-
 #define SECURITY_WIN32
 
 #include <windows.h>
 #include <sspi.h>
+#include <stdio.h>
 
 #define TOKEN_BUFSIZE 4096
 
@@ -38,7 +38,21 @@ struct sspi_handle
 	CtxtHandle context;
 };
 
+struct sspi_negotiate_state {
+    CredHandle credentials;
+    CtxtHandle context;
+    int is_initialized;
+    int is_complete;
+    unsigned long flags;
+};
+
+int sspi_negotiate_request(char **dst, struct sspi_negotiate_state *state, const char *proxy_hostname);
+int sspi_negotiate_response(char **dst, char *challenge, int challen, struct sspi_negotiate_state *state);
+void sspi_negotiate_cleanup(struct sspi_negotiate_state *state);
+const char* sspi_get_scheme(void);
+
 extern int sspi_enabled(void);
+extern int sspi_is_negotiate(void);
 extern int sspi_set(char *mode);
 extern int sspi_unset(void);
 
